@@ -24,11 +24,13 @@ input_field_rect = input_field.get_rect(center=(38, 38))
 inp_rect = pygame.Rect(0, 0, 340, 280)
 inp_rect.center = (200, 150)
 
-def drawMultilineText(screen, font, text: str, color: pygame.Color, text_rect: pygame.Rect, max_char: int):
+def drawMultilineText(screen, font, text: str, color: pygame.Color, 
+                      text_rect: pygame.Rect, max_char: int):
     n = 0
     temp_rect = copy.copy(text_rect)
     while n < len(text):
-        screen.blit(font.render(text[n:n + max_char], True, color), temp_rect)
+        screen.blit(font.render(text[n:n + max_char], True, color), 
+                    temp_rect)
         n += max_char
         temp_rect.y += font.get_height()
 
