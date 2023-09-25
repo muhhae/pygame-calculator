@@ -112,7 +112,8 @@ while running:
 
     screen.fill("honeydew4")
 
-    pygame.draw.rect(screen, pygame.Color("gray"), inp_rect, border_radius=10)
+    pygame.draw.rect(screen, pygame.Color("gray"), inp_rect, 
+                     border_radius=10)
 
     for button in button_list:
         button.handleEvent()
