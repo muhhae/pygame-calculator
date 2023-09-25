@@ -11,7 +11,7 @@ def opVal(op: str):
     match op:
         case "+" | "-": return 0
         case "*" | "/": return 1
-        case "^": return 3
+        case "^": return 2
 
 
 def listprint(l: list):
@@ -68,7 +68,7 @@ def infixToPostfix(n: str):
                 result.append(" ")
             aux.pop()
         else:
-            while len(aux) > 0 and aux[-1] != "(" and opVal(aux[-1]) > opVal(c):
+            while len(aux) > 0 and aux[-1] != "(" and opVal(aux[-1]) >= opVal(c):
                 result.append(aux.pop())
                 result.append(" ")
             aux.append(c)
@@ -97,7 +97,7 @@ def calculatePostfix(n: list):
         if c == " ":
             continue
         if not isOp(c):
-            result.append(float(c))
+            result.append(int(c))
             continue
 
         b = result.pop()

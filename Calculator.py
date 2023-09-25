@@ -24,15 +24,13 @@ input_field_rect = input_field.get_rect(center=(38, 38))
 inp_rect = pygame.Rect(0, 0, 340, 280)
 inp_rect.center = (200, 150)
 
-
-def drawMultilineText(screen, font, text: str, color: pygame.Color, text_rect: pygame.Rect, max_line: int):
+def drawMultilineText(screen, font, text: str, color: pygame.Color, text_rect: pygame.Rect, max_char: int):
     n = 0
     temp_rect = copy.copy(text_rect)
     while n < len(text):
-        screen.blit(font.render(text[n:n + max_line], True, color), temp_rect)
-        n += max_line
+        screen.blit(font.render(text[n:n + max_char], True, color), temp_rect)
+        n += max_char
         temp_rect.y += font.get_height()
-
 
 def inputButton(button: Button):
 
@@ -40,10 +38,10 @@ def inputButton(button: Button):
 
     global input_text
 
-    if input_text == "Syntax Error":
+    if input_text in ["Syntax Error", "0"]:
         input_text = ""
 
-    if (button.text_content == "="):
+    if button.text_content == "=":
         try:
             result = calculatePostfix(infixToPostfix(input_text))
             result = int(result) if result % 1 == 0 else result
@@ -51,17 +49,15 @@ def inputButton(button: Button):
         except:
             input_text = "Syntax Error"
 
-    elif (button.text_content == "<-"):
+    elif button.text_content == "<-":
         input_text = input_text[:-1]
         
     else: 
         input_text += button.text_content
 
     if len(input_text) >= 18 * 7:
-        input_text = input_text[:18 * 7 - 1]
+        input_text = input_text[:18 * 7]
         return
-
-
 
 button_size = 60
 
@@ -101,6 +97,14 @@ for i, e in enumerate(inp):
 while running:
     dt = clock.tick(60) / 1000
     for event in pygame.event.get():
+        if event.type == pygame.KEYDOWN:
+            match event.key:
+                case pygame.K_BACKSPACE:
+                    input_text = input_text[:-1]
+                case pygame.K_ESCAPE:
+                    input_text = ""
+            if 48 <= event.key <= 57:
+                input_text += str(event.key - 48)
         if event.type == pygame.QUIT:
             running = False
 
