@@ -1,10 +1,13 @@
+# import sys, os
+
+# sys.stdout = open(os.devnull, "w")
+# sys.stderr = open(os.devnull, "w")
+
 import pygame
 import copy
 
 from Button import Button
-
-from InfixToPostfix import infixToPostfix
-from InfixToPostfix import calculatePostfix
+from InfixToPostfix import infixToPostfix, calculatePostfix
 
 pygame.init()
 
@@ -40,8 +43,8 @@ def inputButton(button: Button):
 
     global input_text
 
-    if input_text in ["Syntax Error", "0"]:
-        input_text = ""
+    if input_text in ["Syntax Error"]:
+        input_text = "0"
 
     if button.text_content == "=":
         try:
@@ -50,17 +53,22 @@ def inputButton(button: Button):
             input_text = str(result)
         except:
             input_text = "Syntax Error"
-
+            
     elif button.text_content == "<-":
         input_text = input_text[:-1]
         
     else: 
+        if input_text == "0": 
+            input_text = ""
         input_text += button.text_content
 
     if len(input_text) >= 18 * 7:
         input_text = input_text[:18 * 7]
         return
 
+    if input_text == "":
+        input_text = "0"
+        
 button_size = 60
 
 gap = [0, 0]
@@ -96,6 +104,8 @@ for i, e in enumerate(inp):
 
     button_list.append(button_temp)
 
+input_text = "0"
+
 while running:
     dt = clock.tick(60) / 1000
     for event in pygame.event.get():
@@ -103,9 +113,13 @@ while running:
             match event.key:
                 case pygame.K_BACKSPACE:
                     input_text = input_text[:-1]
+                    if input_text == "":
+                        input_text = "0"
                 case pygame.K_ESCAPE:
-                    input_text = ""
+                    input_text = "0"
             if 48 <= event.key <= 57:
+                if input_text == 0: 
+                    input_text = ""
                 input_text += str(event.key - 48)
         if event.type == pygame.QUIT:
             running = False

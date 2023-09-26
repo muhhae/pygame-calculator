@@ -97,7 +97,7 @@ def calculatePostfix(n: list):
         if c == " ":
             continue
         if not isOp(c):
-            result.append(int(c))
+            result.append(float(c))
             continue
 
         b = result.pop()
@@ -135,15 +135,15 @@ def initTugas(s: str):
     print()
 
 
-Str = [
-    "2*3^4*5+9",
-    "A*B+C*D",
-    "2 * ( 3 + 5 )",
-    "2*(3^(1+1) + 5 * ((1+1)*(1+1)))",
-    "23 + 34 * 21"
-]
 
 if __name__ == "__main__":
+    Str = [
+        "2*3^4*5+9",
+        "A*B+C*D",
+        "2 * ( 3 + 5 )",
+        "2*(3^(1+1) + 5 * ((1+1)*(1+1)))",
+        "23 + 34 * 21"
+    ]
     print("-- Infix To Postfix -- \n")
     for e in Str:
         initTugas(e)
