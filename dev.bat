@@ -1,1 +1,1 @@
-pyinstaller -w --noconfirm --icon=icon.png --onedir --add-data "icon.png:." Calculator.py 
+pyinstaller -w --noconfirm --icon=icon.ico --onedir --add-data=icon.png:. Calculator.py 
