@@ -11,6 +11,7 @@ from InfixToPostfix import infixToPostfix, calculatePostfix
 
 pygame.init()
 
+pygame.display.set_icon(pygame.image.load("icon.png"))
 pygame.display.set_caption("Calculator")
 
 screen = pygame.display.set_mode((400, 600))
@@ -27,15 +28,17 @@ input_field_rect = input_field.get_rect(center=(38, 38))
 inp_rect = pygame.Rect(0, 0, 340, 280)
 inp_rect.center = (200, 150)
 
-def drawMultilineText(screen, font, text: str, color: pygame.Color, 
+
+def drawMultilineText(screen, font, text: str, color: pygame.Color,
                       text_rect: pygame.Rect, max_char: int):
     n = 0
     temp_rect = copy.copy(text_rect)
     while n < len(text):
-        screen.blit(font.render(text[n:n + max_char], True, color), 
+        screen.blit(font.render(text[n:n + max_char], True, color),
                     temp_rect)
         n += max_char
         temp_rect.y += font.get_height()
+
 
 def inputButton(button: Button):
 
@@ -53,12 +56,12 @@ def inputButton(button: Button):
             input_text = str(result)
         except:
             input_text = "Syntax Error"
-            
+
     elif button.text_content == "<-":
         input_text = input_text[:-1]
-        
-    else: 
-        if input_text == "0": 
+
+    else:
+        if input_text == "0":
             input_text = ""
         input_text += button.text_content
 
@@ -68,7 +71,8 @@ def inputButton(button: Button):
 
     if input_text == "":
         input_text = "0"
-        
+
+
 button_size = 60
 
 gap = [0, 0]
@@ -118,7 +122,7 @@ while running:
                 case pygame.K_ESCAPE:
                     input_text = "0"
             if 48 <= event.key <= 57:
-                if input_text == 0: 
+                if input_text == "0":
                     input_text = ""
                 input_text += str(event.key - 48)
         if event.type == pygame.QUIT:
@@ -126,7 +130,7 @@ while running:
 
     screen.fill("honeydew4")
 
-    pygame.draw.rect(screen, pygame.Color("gray"), inp_rect, 
+    pygame.draw.rect(screen, pygame.Color("gray"), inp_rect,
                      border_radius=10)
 
     for button in button_list:

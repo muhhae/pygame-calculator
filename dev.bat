@@ -1,0 +1,1 @@
+pyinstaller -w --noconfirm --icon=icon.png --onedir --add-data "icon.png:." Calculator.py 
