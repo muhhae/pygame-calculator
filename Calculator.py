@@ -113,6 +113,8 @@ input_text = "0"
 while running:
     dt = clock.tick(60) / 1000
     for event in pygame.event.get():
+        for button in button_list:
+            button.handleEvent(event)
         if event.type == pygame.KEYDOWN:
             match event.key:
                 case pygame.K_BACKSPACE:
@@ -134,7 +136,6 @@ while running:
                      border_radius=10)
 
     for button in button_list:
-        button.handleEvent()
         button.draw(screen)
 
     drawMultilineText(screen, input_font, input_text,

@@ -18,7 +18,6 @@ class Button:
         self.text_rect = self.text.get_rect(center=self.rect.center)
 
         self.hovered = False
-        self.clicked = False
         
         self.on_click = lambda x: None
         self.on_hover = lambda x: None
@@ -33,18 +32,11 @@ class Button:
             
         screen.blit(self.text, self.text_rect)
     
-    def handleEvent(self):
+    def handleEvent(self, event: pygame.event.Event):
         mouse_pos = pygame.mouse.get_pos()
-        if self.rect.collidepoint(mouse_pos):
-            if not self.hovered:
-                self.hovered = True
-                self.on_hover(self)
-            if pygame.mouse.get_pressed()[0]:
-                if self.clicked:
-                    return
-                self.clicked = True
-                self.on_click(self)
-            else:
-                self.clicked = False
-        else:
-            self.hovered = False
+        self.hovered = self.rect.collidepoint(mouse_pos)
+        if self.hovered:
+            self.on_hover(self)
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == pygame.BUTTON_LEFT:
+                    self.on_click(self)
