@@ -27,6 +27,7 @@ def listToStr(l: list):
 
 
 def infixToPostfix(n: str):
+    print("infix:", n)
     result = []
     aux = []
 
@@ -40,6 +41,16 @@ def infixToPostfix(n: str):
     step = 0
     for i, c in enumerate(n):
         if c == " ":
+            continue
+        if c == "-" and (isOp(n[i-1]) or i == 0):
+            cTemp += c
+            if i == len(n) - 1:
+                result.append(cTemp)
+                result.append(" ")
+                step += 1
+                table.add_row(str(step), cTemp, listToStr(
+                    aux), listToStr(result))
+                table.add_section()
             continue
         if isOp(c):
             if cTemp != "":

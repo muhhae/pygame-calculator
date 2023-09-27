@@ -20,10 +20,10 @@ dt = clock.tick(60) / 1000
 
 running = True
 
-input_font = pygame.font.SysFont("firacode", 30)
+input_font = pygame.font.SysFont("digital7mono", 40)
 input_text = ""
 input_field = input_font.render(input_text, True, pygame.Color("black"))
-input_field_rect = input_field.get_rect(center=(38, 38))
+input_field_rect = input_field.get_rect(center=(38, 33))
 
 inp_rect = pygame.Rect(0, 0, 340, 280)
 inp_rect.center = (200, 150)
@@ -37,7 +37,7 @@ def drawMultilineText(screen, font, text: str, color: pygame.Color,
         screen.blit(font.render(text[n:n + max_char], True, color),
                     temp_rect)
         n += max_char
-        temp_rect.y += font.get_height()
+        temp_rect.y += font.get_height() + 10
 
 
 def inputButton(button: Button):
@@ -64,10 +64,6 @@ def inputButton(button: Button):
         if input_text == "0":
             input_text = ""
         input_text += button.text_content
-
-    if len(input_text) >= 18 * 7:
-        input_text = input_text[:18 * 7]
-        return
 
     if input_text == "":
         input_text = "0"
@@ -116,6 +112,8 @@ while running:
         for button in button_list:
             button.handleEvent(event)
         if event.type == pygame.KEYDOWN:
+            if input_text in ["Syntax Error"]:
+                input_text = "0"
             match event.key:
                 case pygame.K_BACKSPACE:
                     input_text = input_text[:-1]
@@ -129,6 +127,9 @@ while running:
                 input_text += str(event.key - 48)
         if event.type == pygame.QUIT:
             running = False
+
+    if len(input_text) > 18 * 8:
+        input_text = input_text[:18 * 8]
 
     screen.fill("honeydew4")
 
