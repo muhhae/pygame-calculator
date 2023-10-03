@@ -7,7 +7,7 @@ import pygame
 import copy
 
 from Button import Button
-from InfixToPostfix import infixToPostfix, calculatePostfix
+from InfixToPostfix import infixToPostfix, calculatePostfix, listToStr
 
 pygame.init()
 
@@ -20,13 +20,19 @@ dt = clock.tick(60) / 1000
 
 running = True
 
+inputting = True
+true_value = "0"
+postfix_value = "0"
+bracket_value = "0"
+mode = "Calculate"
+
 input_font = pygame.font.SysFont("digital7mono", 40)
 input_text = ""
 input_field = input_font.render(input_text, True, pygame.Color("black"))
-input_field_rect = input_field.get_rect(center=(38, 33))
+input_field_rect = input_field.get_rect(center=(38, 46))
 
-inp_rect = pygame.Rect(0, 0, 340, 280)
-inp_rect.center = (200, 150)
+inp_rect = pygame.Rect(0, 0, 340, 180)
+inp_rect.center = (200, 120)
 
 
 def drawMultilineText(screen, font, text: str, color: pygame.Color,
@@ -41,32 +47,42 @@ def drawMultilineText(screen, font, text: str, color: pygame.Color,
 
 
 def inputButton(button: Button):
+    global true_value, postfix_value, bracket_value, inputting
 
-    # print("button:", button.text_content)
-
-    global input_text
-
-    if input_text in ["Syntax Error"]:
-        input_text = "0"
+    if true_value in ["Syntax Error"]:
+        true_value = "0"
 
     if button.text_content == "=":
         try:
-            result = calculatePostfix(infixToPostfix(input_text))
+            postfix_res = infixToPostfix(true_value)
+            bracket_res = ""
+            result = calculatePostfix(postfix_res)
+
             result = int(result) if result % 1 == 0 else result
-            input_text = str(result)
+            match mode:
+                case "Calculate":
+                    true_value = str(result)
+                case "Postfix":
+                    postfix_value = listToStr(postfix_res)
+                case "BracketFunct":
+                    bracket_value = bracket_res
+            inputting = False
+            return
         except:
-            input_text = "Syntax Error"
+            true_value = "Syntax Error"
 
     elif button.text_content == "<-":
-        input_text = input_text[:-1]
+        true_value = true_value[:-1]
 
     else:
-        if input_text == "0":
-            input_text = ""
-        input_text += button.text_content
+        if true_value == "0":
+            true_value = ""
+        true_value += button.text_content
 
-    if input_text == "":
-        input_text = "0"
+    if true_value == "":
+        true_value = "0"
+
+    inputting = True
 
 
 button_size = 60
@@ -105,6 +121,40 @@ for i, e in enumerate(inp):
     button_list.append(button_temp)
 
 input_text = "0"
+line_start = 0
+
+
+def changeMode(button: Button):
+    global mode
+    mode_list = ["Calculate", "Postfix", "BracketFunct"]
+    mode = button.text_content
+
+    i = mode_list.index(mode) + 1
+    if i >= len(mode_list):
+        i = 0
+    button.text_content = mode_list[i]
+    mode = mode_list[i]
+
+
+def ac(button: Button):
+    global true_value, postfix_value, bracket_value
+    true_value = "0"
+    postfix_value = "0"
+    bracket_value = "0"
+
+
+button_mode = Button(2 * button_size + 10, - button_size - gap_size + gap[1] + 290,
+                     button_size * 3 + gap_size * 2, button_size, mode, button_color,
+                     pygame.Color("white"), pygame.font.SysFont("firacode", 22))
+button_mode.on_click = changeMode
+button_list.append(button_mode)
+
+button_ac = Button(5 * button_size - gap_size * 3, - button_size - gap_size + gap[1] + 290,
+                   button_size, button_size, "AC", button_color,
+                   pygame.Color("white"), pygame.font.SysFont("firacode", 22))
+button_ac.on_click = ac
+
+button_list.append(button_ac)
 
 while running:
     dt = clock.tick(60) / 1000
@@ -112,24 +162,57 @@ while running:
         for button in button_list:
             button.handleEvent(event)
         if event.type == pygame.KEYDOWN:
-            if input_text in ["Syntax Error"]:
-                input_text = "0"
+            if true_value == "Syntax Error":
+                true_value = "0"
             match event.key:
                 case pygame.K_BACKSPACE:
-                    input_text = input_text[:-1]
-                    if input_text == "":
-                        input_text = "0"
+                    true_value = true_value[:-1]
+                    if true_value == "":
+                        true_value = "0"
                 case pygame.K_ESCAPE:
-                    input_text = "0"
+                    true_value = "0"
+                case pygame.K_DOWN:
+                    line_start += 1
+                case pygame.K_UP:
+                    line_start -= 1
             if 48 <= event.key <= 57:
-                if input_text == "0":
-                    input_text = ""
-                input_text += str(event.key - 48)
+                if true_value == "0":
+                    true_value = ""
+                true_value += str(event.key - 48)
+                inputting = True
         if event.type == pygame.QUIT:
             running = False
 
-    if len(input_text) > 18 * 8:
-        input_text = input_text[:18 * 8]
+    text_to_show = ""
+    match button_mode.text_content:
+        case "Calculate":
+            text_to_show = true_value
+        case "Postfix":
+            text_to_show = postfix_value
+        case "BracketFunct":
+            text_to_show = postfix_value
+
+    if inputting:
+        text_to_show = true_value
+
+    if line_start < 0 or len(text_to_show) / 18 <= 5:
+        line_start = 0
+
+    max_line_start = len(text_to_show) / 18 - 4
+
+    if max_line_start < 0:
+        max_line_start = 0
+
+    if line_start > max_line_start:
+        line_start = int(max_line_start)
+
+    index_start = line_start * 18
+    index_end = index_start + 18 * 5
+
+    if index_end > len(text_to_show):
+        index_end = len(text_to_show)
+
+    input_text = text_to_show[index_start: index_end]
 
     screen.fill("honeydew4")
 

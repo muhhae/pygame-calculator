@@ -26,7 +26,17 @@ def listToStr(l: list):
     return s
 
 
+def checkBracket(n: str):
+    openBracket = n.count("(")
+    closeBracket = n.count(")")
+    if openBracket > closeBracket:
+        n += ")" * (openBracket - closeBracket)
+    else:
+        n = "(" * (closeBracket - openBracket) + n
+    return n
+
 def infixToPostfix(n: str):
+    n = checkBracket(n)
     print("infix:", n)
     result = []
     aux = []
@@ -144,7 +154,6 @@ def initTugas(s: str):
             calculatePostfix(Str)
             break
     print()
-
 
 
 if __name__ == "__main__":
