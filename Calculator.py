@@ -7,7 +7,7 @@ import pygame
 import copy
 
 from Button import Button
-from InfixToPostfix import infixToPostfix, calculatePostfix, listToStr
+from InfixToPostfix import infixToPostfix, calculatePostfix, listToStr, bracketFunc
 
 pygame.init()
 
@@ -26,10 +26,10 @@ postfix_value = "0"
 bracket_value = "0"
 mode = "Calculate"
 
-input_font = pygame.font.SysFont("digital7mono", 40)
+input_font = pygame.font.SysFont("firacode", 28)
 input_text = ""
 input_field = input_font.render(input_text, True, pygame.Color("black"))
-input_field_rect = input_field.get_rect(center=(38, 46))
+input_field_rect = input_field.get_rect(center=(45, 50))
 
 inp_rect = pygame.Rect(0, 0, 340, 180)
 inp_rect.center = (200, 120)
@@ -43,7 +43,29 @@ def drawMultilineText(screen, font, text: str, color: pygame.Color,
         screen.blit(font.render(text[n:n + max_char], True, color),
                     temp_rect)
         n += max_char
-        temp_rect.y += font.get_height() + 10
+        temp_rect.y += font.get_height()
+
+
+def calc():
+    global true_value, postfix_value, bracket_value, inputting
+    try:
+        postfix_res = infixToPostfix(true_value)
+        bracket_res = bracketFunc(postfix_res)
+        result = calculatePostfix(postfix_res)
+
+        result = int(result) if result % 1 == 0 else result
+        match mode:
+            case "Calculate":
+                true_value = str(result)
+            case "Postfix":
+                postfix_value = listToStr(postfix_res)
+            case "BracketFunct":
+                bracket_value = bracket_res
+        inputting = False
+        return 1
+    except:
+        true_value = "Syntax Error"
+        return 0
 
 
 def inputButton(button: Button):
@@ -53,25 +75,10 @@ def inputButton(button: Button):
         true_value = "0"
 
     if button.text_content == "=":
-        try:
-            postfix_res = infixToPostfix(true_value)
-            bracket_res = ""
-            result = calculatePostfix(postfix_res)
-
-            result = int(result) if result % 1 == 0 else result
-            match mode:
-                case "Calculate":
-                    true_value = str(result)
-                case "Postfix":
-                    postfix_value = listToStr(postfix_res)
-                case "BracketFunct":
-                    bracket_value = bracket_res
-            inputting = False
+        if calc():
             return
-        except:
-            true_value = "Syntax Error"
 
-    elif button.text_content == "<-":
+    elif button.text_content == "⌫":
         true_value = true_value[:-1]
 
     else:
@@ -94,7 +101,7 @@ button_list = []
 inp = [1, 2, 3, "+", "-",
        4, 5, 6, "*", "/",
        7, 8, 9, "(", ")",
-       ".", 0, "<-", "^", "="]
+       ".", 0, "⌫", "^", "="]
 
 for i, e in enumerate(inp):
 
@@ -107,15 +114,18 @@ for i, e in enumerate(inp):
         gap[1] += gap_size
         gap[0] = 0
 
+    font = pygame.font.SysFont("firacode", 25)
     button_color = pygame.Color("grey25")
+
     if e in ["+", "-", "*", "/", "^", "(", ")", "=", "."]:
         button_color = pygame.Color("goldenrod")
-    if e == "<-":
+    if e == "⌫":
         button_color = pygame.Color("orangered1")
+        font = pygame.font.SysFont("firacode", 30)
 
     button_temp = Button(x, y, button_size, button_size,
                          str(e), button_color, pygame.Color("white"),
-                         pygame.font.SysFont("firacode", 25))
+                         font)
     button_temp.on_click = inputButton
 
     button_list.append(button_temp)
@@ -143,18 +153,42 @@ def ac(button: Button):
     bracket_value = "0"
 
 
+def line_up(button: Button):
+    global line_start
+    line_start -= 1
+
+
+def line_down(button: Button):
+    global line_start
+    line_start += 1
+
+
 button_mode = Button(2 * button_size + 10, - button_size - gap_size + gap[1] + 290,
-                     button_size * 3 + gap_size * 2, button_size, mode, button_color,
+                     button_size * 3 + gap_size *
+                     2, button_size, mode, pygame.Color("lightseagreen"),
                      pygame.Color("white"), pygame.font.SysFont("firacode", 22))
 button_mode.on_click = changeMode
 button_list.append(button_mode)
 
 button_ac = Button(5 * button_size - gap_size * 3, - button_size - gap_size + gap[1] + 290,
-                   button_size, button_size, "AC", button_color,
-                   pygame.Color("white"), pygame.font.SysFont("firacode", 22))
+                   button_size, button_size, "AC", pygame.Color("orangered1"),
+                   pygame.Color("white"), pygame.font.SysFont("firacode", 26))
 button_ac.on_click = ac
-
 button_list.append(button_ac)
+
+button_up = Button(6 * button_size - gap_size * 2, (- button_size - gap_size - 1 + gap[1])/2*3 + 290,
+                   button_size, button_size / 2 -
+                   5, "/\\", pygame.Color("lightskyblue3"),
+                   pygame.Color("white"), pygame.font.SysFont("firacode", 20))
+button_up.on_click = line_up
+button_list.append(button_up)
+
+button_down = Button(6 * button_size - gap_size * 2, (- button_size - gap_size + 1 + gap[1])/2 + 290,
+                     button_size, button_size / 2 -
+                     5, "\\/", pygame.Color("lightskyblue3"),
+                     pygame.Color("white"), pygame.font.SysFont("firacode", 20))
+button_down.on_click = line_down
+button_list.append(button_down)
 
 while running:
     dt = clock.tick(60) / 1000
@@ -190,7 +224,10 @@ while running:
         case "Postfix":
             text_to_show = postfix_value
         case "BracketFunct":
-            text_to_show = postfix_value
+            text_to_show = bracket_value
+
+    if text_to_show == "0":
+        text_to_show = true_value
 
     if inputting:
         text_to_show = true_value

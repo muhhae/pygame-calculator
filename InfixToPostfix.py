@@ -35,6 +35,7 @@ def checkBracket(n: str):
         n = "(" * (closeBracket - openBracket) + n
     return n
 
+
 def infixToPostfix(n: str):
     n = checkBracket(n)
     print("infix:", n)
@@ -146,6 +147,25 @@ def calculatePostfix(n: list):
     return res
 
 
+def bracketFunc(n: list):
+    result = []
+    for c in n:
+        if c == " ":
+            continue
+        if not isOp(c):
+            result.append(c)
+            continue
+
+        b = result.pop()
+        a = result.pop()
+
+        result.append('(' + a + c + b + ')')
+    print()
+    res = result.pop()
+    print("result\t:", res)
+    return res
+
+
 def initTugas(s: str):
     print("infix\t:", s)
     Str = infixToPostfix(s)
@@ -158,11 +178,8 @@ def initTugas(s: str):
 
 if __name__ == "__main__":
     Str = [
-        "2*3^4*5+9",
-        "A*B+C*D",
-        "2 * ( 3 + 5 )",
-        "2*(3^(1+1) + 5 * ((1+1)*(1+1)))",
-        "23 + 34 * 21"
+        "A*B*(C+D * (E+F))",
+        "1 * 2 * (3 + 4 * (5 + 6))"
     ]
     print("-- Infix To Postfix -- \n")
     for e in Str:
