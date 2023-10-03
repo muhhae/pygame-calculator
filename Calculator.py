@@ -135,7 +135,7 @@ line_start = 0
 
 
 def changeMode(button: Button):
-    global mode
+    global mode, true_value, postfix_value, bracket_value
     mode_list = ["Calculate", "Postfix", "BracketFunct"]
     mode = button.text_content
 
@@ -144,6 +144,7 @@ def changeMode(button: Button):
         i = 0
     button.text_content = mode_list[i]
     mode = mode_list[i]
+    postfix_value, bracket_value = true_value, true_value
 
 
 def ac(button: Button):
