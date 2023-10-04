@@ -3,11 +3,16 @@
 # sys.stdout = open(os.devnull, "w")
 # sys.stderr = open(os.devnull, "w")
 
-import pygame
-import copy
-
-from Button import Button
 from InfixToPostfix import infixToPostfix, calculatePostfix, listToStr, bracketFunc
+from Button import Button
+import copy
+import pygame
+import ctypes
+
+# try:
+#     ctypes.windll.shcore.SetProcessDpiAwareness(2)
+# except:
+#     pass
 
 pygame.init()
 
@@ -17,6 +22,8 @@ pygame.display.set_caption("Calculator")
 screen = pygame.display.set_mode((400, 600))
 clock = pygame.time.Clock()
 dt = clock.tick(60) / 1000
+
+print(pygame.display.Info())
 
 running = True
 
@@ -54,13 +61,16 @@ def calc():
         result = calculatePostfix(postfix_res)
 
         result = int(result) if result % 1 == 0 else result
+        print(mode)
         match mode:
             case "Calculate":
                 true_value = str(result)
+                print("tv:", true_value)
             case "Postfix":
                 postfix_value = listToStr(postfix_res)
             case "BracketFunct":
                 bracket_value = bracket_res
+                true_value = bracket_value
         inputting = False
         return 1
     except:
@@ -166,7 +176,7 @@ def line_down(button: Button):
 
 button_mode = Button(2 * button_size + 10, - button_size - gap_size + gap[1] + 290,
                      button_size * 3 + gap_size *
-                     2, button_size, mode, pygame.Color("lightseagreen"),
+                     2, button_size, mode, pygame.Color("goldenrod"),
                      pygame.Color("white"), pygame.font.SysFont("firacode", 22))
 button_mode.on_click = changeMode
 button_list.append(button_mode)
@@ -179,14 +189,14 @@ button_list.append(button_ac)
 
 button_up = Button(6 * button_size - gap_size * 2, (- button_size - gap_size - 1 + gap[1])/2*3 + 290,
                    button_size, button_size / 2 -
-                   5, "/\\", pygame.Color("lightskyblue3"),
+                   5, "⟰", pygame.Color("grey25"),
                    pygame.Color("white"), pygame.font.SysFont("firacode", 20))
 button_up.on_click = line_up
 button_list.append(button_up)
 
 button_down = Button(6 * button_size - gap_size * 2, (- button_size - gap_size + 1 + gap[1])/2 + 290,
                      button_size, button_size / 2 -
-                     5, "\\/", pygame.Color("lightskyblue3"),
+                     5, "⟱", pygame.Color("grey25"),
                      pygame.Color("white"), pygame.font.SysFont("firacode", 20))
 button_down.on_click = line_down
 button_list.append(button_down)
@@ -227,10 +237,7 @@ while running:
         case "BracketFunct":
             text_to_show = bracket_value
 
-    if text_to_show == "0":
-        text_to_show = true_value
-
-    if inputting:
+    if text_to_show == "0" or inputting:
         text_to_show = true_value
 
     if line_start < 0 or len(text_to_show) / 18 <= 5:

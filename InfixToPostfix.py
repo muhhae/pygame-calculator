@@ -65,13 +65,17 @@ def infixToPostfix(n: str):
             continue
         if isOp(c):
             if cTemp != "":
-                result.append(cTemp)
-                result.append(" ")
+                if cTemp != "-":
+                    result.append(cTemp)
+                    result.append(" ")
+                    cTemp = ""
+                else:
+                    aux.append(cTemp)
+                    cTemp = ""
                 step += 1
                 table.add_row(str(step), cTemp, listToStr(
                     aux), listToStr(result))
                 table.add_section()
-                cTemp = ""
         if not isOp(c):
             cTemp += c
             if i == len(n) - 1:
